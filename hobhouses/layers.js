@@ -1,3 +1,16 @@
+var tocCategories = [
+		{
+			"name": "GeoJSON layers",
+			"layers": ["hobhouse"]
+		},
+		{
+			"name": "WMS layers",
+			"layers": ["waterbodies"],
+			"exclusive": false
+		}
+	];
+
+
 var layers = [
         {
         "id": "hobhouse",
@@ -32,6 +45,18 @@ var layers = [
 			"type": "wmsTiledLayer",
 			"url": "https://geoserver.digitalearth.africa/geoserver/waterbodies/wms",
 			"layers": "waterbodies:DEAfrica_Waterbodies",
+            "identify": {
+                //"layerName": "layer name", Not really neccesary, already defined.
+                //"layerLabel": "layer label", uncomment to override id and name as defined on the layer.
+                //"primaryField": "wb_id", Uncomment this to get a heading based on the value of this field.
+                /* Uncomment this to restrict output and or launder output with alias, decimals, prefix, etc.
+                  "outFields": [
+                        {"name": "field_name", "alias": "Field Alias", "prefix": "$"},
+                        {"name": "field alias", "thousands": true, "decimals": 2}
+                    ],
+                */ 
+            },
+            "maxAllowableOffset": 0.01,
 			'EPSG': 4326,
             "maxZoom": 22,
             "visible": true,
@@ -39,3 +64,5 @@ var layers = [
             "transparent": true
         }
 	];
+    
+var  basemaps = ['OpenStreetMap'];

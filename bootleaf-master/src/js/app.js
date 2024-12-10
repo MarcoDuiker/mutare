@@ -2209,54 +2209,63 @@ function runIdentifies(evt) {
         function( data, textStatus, jqXHR ) {
           $("#ajaxLoading").hide();
           // Obtain the layer ID and retrieve its layerConfig object
+          //console.log("Showing identify results");
+          //console.log(data);
           if (data.features.length > 0){
             var layerId = data.features[0].id.substring(0,data.features[0].id.indexOf("."));
             var layerConfig = jqXHR.layerConfig;
             for (var i=0; i < bootleaf.identifyLayers.length; i++){
               var identifyLayer = bootleaf.identifyLayers[i];
-              if (layerConfig.identify.layerName === layerId){
-
-                var layerName = layerConfig.name || layerConfig.id || "unknown layer";
-
-                if (bootleaf.identifyResponse[layerId] === undefined){
-                  bootleaf.identifyResponse[layerId] = {
-                    "config": layerConfig
-                  };
-                }
-
-                for (var j = 0; j<data.features.length; j++){
-                  var result = data.features[j];
-                  result.layerId = layerId;
-                  result.layerName = layerName;
-                  result.attributes = result.properties;
-                  if (data.crs !== undefined && data.crs.properties !== undefined && data.crs.properties.name !== undefined){
-                    result.crs = data.crs.properties.name;
-                  }
-                  var value = JSON.stringify(result.attributes);
-                  if (bootleaf.identifyResponse[layerId][value] === undefined) {
-                    if (layerConfig.identify.maxFeatures !== undefined){
-                      if (bootleaf.identifyCounter[layerName] === undefined) {
-                        bootleaf.identifyCounter[layerName] = 1;
-                      } else {
-                        bootleaf.identifyCounter[layerName] += 1;
-                      }
-                      if (bootleaf.identifyCounter[layerName] <= layerConfig.identify.maxFeatures) {
-                        bootleaf.identifyResponse[layerId][value] = value;
-                        displayIdentifyResult(layerId, layerName, layerConfig, result);
-                      }
-                    } else if (bootleaf.identifyResponse[layerId][value] !== value){
-                      bootleaf.identifyResponse[layerId][value] = value;
-                      displayIdentifyResult(layerId, layerName, layerConfig, result);
+              //console.log("Processing layer: ", i);
+             
+              if (!(name in layerConfig) ||  layerConfig.name === undefined || layerConfig.identify.layerName === layerId) {
+                    var layerName = layerConfig.name || layerConfig.id || "unknown layer";
+                    //console.log("... named: ", layerName);
+                    if (bootleaf.identifyResponse[layerId] === undefined){
+                      bootleaf.identifyResponse[layerId] = {
+                        "config": layerConfig
+                      };
                     }
-                  } else if (bootleaf.identifyResponse[layerId][JSON.stringify(result.attributes)] === undefined) {
-                      bootleaf.identifyResponse[layerId][value] = value;
-                      displayIdentifyResult(layerId, layerName, layerConfig, result);
-                  }
+                    
+                    for (var j = 0; j<data.features.length; j++){
+                      var result = data.features[j];
+                      //console.log(result);
+                      result.layerId = layerId;
+                      result.layerName = layerName;
+                      result.attributes = result.properties;
+                      if (data.crs !== undefined && data.crs.properties !== undefined && data.crs.properties.name !== undefined){
+                        result.crs = data.crs.properties.name;
+                      }
+                      var value = JSON.stringify(result.attributes);
+                      //console.log(value);
+                      if (bootleaf.identifyResponse[layerId][value] === undefined) {
+                        if (layerConfig.identify.maxFeatures !== undefined){
+                          if (bootleaf.identifyCounter[layerName] === undefined) {
+                            bootleaf.identifyCounter[layerName] = 1;
+                          } else {
+                            bootleaf.identifyCounter[layerName] += 1;
+                          }
+                          if (bootleaf.identifyCounter[layerName] <= layerConfig.identify.maxFeatures) {
+                            bootleaf.identifyResponse[layerId][value] = value;
+                            displayIdentifyResult(layerId, layerName, layerConfig, result);
+                          }
+                        } else if (bootleaf.identifyResponse[layerId][value] !== value){
+                          bootleaf.identifyResponse[layerId][value] = value;
+                          displayIdentifyResult(layerId, layerName, layerConfig, result);
+                        }
+                      } else if (bootleaf.identifyResponse[layerId][JSON.stringify(result.attributes)] === undefined) {
+                          bootleaf.identifyResponse[layerId][value] = value;
+                          displayIdentifyResult(layerId, layerName, layerConfig, result);
+                      }
 
-                }
+                    }
 
+              } else {
+                  //console.log("layerName ", layerConfig.identify.layerName, " does not match layerId ", layerId);
               }
             }
+          } else {
+              console.log("No data in identify results");
           }
         }, function(error) {
           $("#sidebarContents").html("<p><span class='info'>There was an error with the Identify tool</span></p>");
@@ -2300,16 +2309,23 @@ function displayIdentifyResult(layerId, layerName, layerConfig, result){
     bootleaf.wantedFields.push(layerConfig.identify.primaryField);
   }
   var outFields = [];
-  if (layerConfig.identify.outFields !== undefined) {
+  if (outFields in layerConfig.identify && layerConfig.identify.outFields !== undefined) {
     outFields = layerConfig.identify.outFields;
-  } else if(layerConfig.outFields !== undefined) {
+  } else if(outFields in layerConfig && layerConfig.outFields !== undefined) {
     outFields = layerConfig.outFields;
   }
   if (outFields.length > 0) {
     Object.keys(outFields).map(function(i, field){
       bootleaf.wantedFields.push(outFields[field]['name']);
     });
+  } else {
+      //We'll add them all
+      for(var field in result.attributes){
+         outFields.push({ "name": field});
+         bootleaf.wantedFields.push(field);
+      }
   }
+  //console.log(result.attributes);
   for(var field in result.attributes){
     if (bootleaf.wantedFields.indexOf(field) > -1) {
       outFeature.attributes[field] = result.attributes[field];
@@ -2360,6 +2376,8 @@ function displayIdentifyResult(layerId, layerName, layerConfig, result){
 
 function handleWMSIdentifyResult(data){
   $("#ajaxLoading").hide();
+  //MD: this function seems obsolete
+  console.log("Showing identify results: ", data);
   // Obtain the layer ID and retrieve its layerConfig object
   if (data.features.length > 0){
     var layerId = data.features[0].id.substring(0,data.features[0].id.indexOf("."));
@@ -2382,6 +2400,8 @@ function handleWMSIdentifyResult(data){
 
       }
     }
+  } else {
+      console.log("No features found in data");
   }
 }
 
