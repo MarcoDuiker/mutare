@@ -2309,23 +2309,24 @@ function displayIdentifyResult(layerId, layerName, layerConfig, result){
     bootleaf.wantedFields.push(layerConfig.identify.primaryField);
   }
   var outFields = [];
-  if (outFields in layerConfig.identify && layerConfig.identify.outFields !== undefined) {
+  if (layerConfig.identify.outFields !== undefined) {
     outFields = layerConfig.identify.outFields;
-  } else if(outFields in layerConfig && layerConfig.outFields !== undefined) {
+  } else if(layerConfig.outFields !== undefined) {
     outFields = layerConfig.outFields;
   }
+
+  if (outFields.length === 0) {
+      //MD: if not defined, we'll add them all
+      console.log("No outfields definition found, so adding all fields");
+      for(var field in result.attributes){
+         outFields.push({ "name": field});
+      }
+  }; 
   if (outFields.length > 0) {
     Object.keys(outFields).map(function(i, field){
       bootleaf.wantedFields.push(outFields[field]['name']);
     });
-  } else {
-      //MD: if not defined, we'll add them all
-      for(var field in result.attributes){
-         outFields.push({ "name": field});
-         bootleaf.wantedFields.push(field);
-      }
   }
-  //console.log(result.attributes);
   for(var field in result.attributes){
     if (bootleaf.wantedFields.indexOf(field) > -1) {
       outFeature.attributes[field] = result.attributes[field];

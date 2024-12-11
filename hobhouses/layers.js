@@ -1,14 +1,14 @@
 var tocCategories = [
-		{
-			"name": "GeoJSON layers",
-			"layers": ["hobhouse"]
-		},
-		{
-			"name": "WMS layers",
-			"layers": ["waterbodies"],
-			"exclusive": false
-		}
-	];
+        {
+            "name": "GeoJSON layers",
+            "layers": ["hobhouse"]
+        },
+        {
+            "name": "WMS layers",
+            "layers": ["waterbodies"],
+            "exclusive": false
+        }
+    ];
 
 
 var layers = [
@@ -35,16 +35,16 @@ var layers = [
             },
         "visible": false,
           // "label": {
-          // 	"name": "NAME",
-          // 	"minZoom": 14
+          //    "name": "NAME",
+          //    "minZoom": 14
           // }
         },
         {
-			"id": "waterbodies",
-			"name": "Water bodies",
-			"type": "wmsTiledLayer",
-			"url": "https://geoserver.digitalearth.africa/geoserver/waterbodies/wms",
-			"layers": "waterbodies:DEAfrica_Waterbodies",
+            "id": "waterbodies",
+            "name": "Water bodies",
+            "type": "wmsTiledLayer",
+            "url": "https://geoserver.digitalearth.africa/geoserver/waterbodies/wms",
+            "layers": "waterbodies:DEAfrica_Waterbodies",
             "identify": {
                 //"layerName": "layer name", Not really neccesary, already defined.
                 //"layerLabel": "layer label", uncomment to override id and name as defined on the layer.
@@ -55,6 +55,13 @@ var layers = [
                         {"name": "field alias", "thousands": true, "decimals": 2}
                     ],
                 */ 
+               /*
+                "outFields": [
+                        {"name": "wb_id", "alias": "Identification"},
+                        {"name": "area_m2", "alias": "area"}
+                    ]
+                */
+                
             },
             "geomField" : "geometry",
             "queryWidget": {
@@ -67,13 +74,13 @@ var layers = [
                     {"name": "last_valid_obs_date", "alias": "last valid observation date"}
                 ]
             },
-			'EPSG': 4326,
+            'EPSG': 4326,
             "maxZoom": 22,
             "visible": true,
             "format": 'image/png',
             "transparent": true,
             "showHighlight": true
         }
-	];
+    ];
     
 var  basemaps = ['OpenStreetMap'];
