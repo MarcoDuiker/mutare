@@ -2319,7 +2319,7 @@ function displayIdentifyResult(layerId, layerName, layerConfig, result){
       bootleaf.wantedFields.push(outFields[field]['name']);
     });
   } else {
-      //We'll add them all
+      //MD: if not defined, we'll add them all
       for(var field in result.attributes){
          outFields.push({ "name": field});
          bootleaf.wantedFields.push(field);

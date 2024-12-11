@@ -56,12 +56,23 @@ var layers = [
                     ],
                 */ 
             },
-            "maxAllowableOffset": 0.01,
+            "geomField" : "geometry",
+            "queryWidget": {
+                "queries" : [
+                    {"name": "area_m2", "alias": "area", "type": "numeric"}
+                ],
+                "outFields": [
+                    {"name": "area_m2", "alias": "area"},
+                    {"name": "wb_id", "alias": "identification"},
+                    {"name": "last_valid_obs_date", "alias": "last valid observation date"}
+                ]
+            },
 			'EPSG': 4326,
             "maxZoom": 22,
             "visible": true,
             "format": 'image/png',
-            "transparent": true
+            "transparent": true,
+            "showHighlight": true
         }
 	];
     
